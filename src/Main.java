@@ -10,7 +10,7 @@ public class Main {
 
         Scanner sc =new Scanner(System.in);
 
-    //reservering van het aantal variabelen
+    //reserveren van het aantal variabelen
 
         //integer inlezen, converteren naar integer
         final int aantalSpelletjes =Integer.parseInt(sc.nextLine());
@@ -41,17 +41,14 @@ public class Main {
         }
 
 
-
+        //voor ieder spel
         for(int spelId = 0; spelId < aantalSpelletjes; spelId++) {
-            //behandeling per spel
-            // System.out.println("nieuw spel : spel id = "+spelId);
 
             //resetten van de spelers
             for (Speler s : spelers) {
                 s.reset();
             }
-            //System.out.println("de spelers zijn gereset");
-
+            
             //inlezen van de begingegevens
             aantalMogPersonen = sc.nextInt();
             aantalMogLocaties = sc.nextInt();
@@ -61,144 +58,140 @@ public class Main {
             //berekening van aantal kaartjes per persoon
             aantalKaartjesPerPersoon = (aantalMogLocaties + aantalMogPersonen + aantalMogWapens - 3) / 4;
 
-            /*System.out.println("personen: "+aantalMogPersonen);
-            System.out.println("locaties: "+aantalMogLocaties);
-            System.out.println("wapens: "+aantalMogWapens);
-            System.out.println("vragen: "+aantalEntries);
-            System.out.println("# kaartjes pp: "+aantalKaartjesPerPersoon);*/
-
             //weggegooide string want het eerste leest hij in als einde van de lijn
             vraag = sc.nextLine();
 
+            //voor iedere vraag
             for (int j = 0; j < aantalEntries; j++) {
-                //inlezen van alle vragen en antwoorden
+            	
+                //inlezen 1 vraag en antwoord
                 vraag = sc.nextLine();
 
-
-                //System.out.println("vraag: "+vraag);
-                //welk formaat -> string
-
+                //conversie van de input naar variabelen
                 vraagSteller = ((int) (vraag.charAt(0))) - 48;
                 k1 = vraag.charAt(2);
                 k2 = vraag.charAt(3);
                 k3 = vraag.charAt(4);
                 antwoorder = vraag.charAt(6);
-
-                /*System.out.println("is de conversie correct gebeurd?");
-                System.out.println("vraagsteller: " + vraagSteller);
-                System.out.println("kaartjes:" + k1+k2+k3);
-                System.out.println("antwoorder: "+antwoorder);
-                System.out.println(""); */
-
-
+                
                 //verwerken van de vraag
-
-                //als het antwoord X is , hebben geen van de 3 andere spelers een kaartje van het spel
+                
+                //als het antwoord X is, hebben de 3 andere spelers geen kaartjes van de gevraagde
                 if (antwoorder == 'X') {
 
+     
+               	 	//genereren van de andere spelers
+                		//als speler 3 de vraagsteller is krijgen we 124
+                		//als speler 4 de vraagsteller is krijgen we 123
                     String andereSpelers = genereerTOVSpelers(vraagSteller);
-                    //    System.out.println("andere spelers: "+andereSpelers);
 
+                    //voor elke andere speler
                     for (int i = 0; i < andereSpelers.length(); i++) {
+                    	
+                    	// de 3 kaartjes toevoegen aan zijn lijst met kaartjes die hij zeker niet heeft
                         int spelersId = andereSpelers.charAt(i) - 48;
                         spelers.get(spelersId).voegZekerNietKaartjesToe(k1, k2, k3);
                     }
+                 
+                //einde van wat te doen als het antwoord een 'X' is
+                } 
+                
+                //nu antwoord er dus zowieso een speler, antwoorder is dus zowieso een getal
+                else {
 
-                } else {
-                    //nu is de antwoordern en zowieso een getal, dus mogen we deze converteren
+                	//conversie naar een int
                     int antwrdr = antwoorder - 48;
-                    //als een speler antwoord vb vraagsteller = 2, antwoorder = 1
+                    
+                    //genereren van de spelers tussen vrager en antwoorder
+                    	//als speler1= vrager, speler4 = antwoorder, dan krijgen we 23,
+                    	//als speler 3 vrager, speler2 = antwoorder, dan krijgen we 41
+                    	//als speler 3 vrager, speler4 = antwoorder, dan krijgen we een lege string
                     String tussenLiggendeSpelers = genereerTussenliggendeSpelers(vraagSteller, antwrdr);
-                    //dan hebben alle tussenliggendespelers geen van de 3 kaartjes
-                    //dan heeft antwoorder (1) minstens 1 van de 3 kaartjes
 
-                    //nog opletten als de string leeg is, wat gebeurt der dan? best debuggen
-
-                    //andtwoorder heeft 1 van de 3 kaartjes
+                    //de antwoorder heeft minstens 1 van de 3 kaartjes
                     spelers.get(antwrdr).voegComboMinstensEenToe(k1, k2, k3);
 
-                    //tussenliggende spelers hebben deze kaartjes zeker niet
+                    //de tussenliggendespelers hebben geen van de 3 kaartjes
                     for (int i = 0; i < tussenLiggendeSpelers.length(); i++) {
                         spelers.get(tussenLiggendeSpelers.charAt(i) - 48).voegZekerNietKaartjesToe(k1, k2, k3);
                     }
+                    
+                //einde van wat te doen als de antwoorder een getal is
                 }
+
+            //einde van het inlezen van de gegevens
             }
             //nu zijn alle vragen en gegevens ingelezen
 
-            //verdere verwerking van de hashlijsten
-            /*System.out.println("testing sets");
-            for(int i=1; i<spelers.size(); i++){
-                System.out.println("spelerid" + i);
-                spelers.get(i).printLijsten();
-                System.out.println();
-                System.out.println();
-            }*/
-
-            //voor elke speler de kaartjes die hij zeker niet heeft halen uit de combinaties
-            //opgelet: enkel voor de lijsten van de speler zelf
-            for (int i = 1; i < spelers.size(); i++) {
-                    spelers.get(i).filter();
-                    //3x want deze methode kan maar 1 aanpassing per keer doen voor elke 3 char tellende string
-
-                /*System.out.println("na het filteren van de eigen kaartjes");
-                System.out.println("speler "+i+": ");*/
-                spelers.get(i).vindKaartjes();
-                /*System.out.println("///////////////////////");
-                System.out.println("///////////////////////");
-                System.out.println("///////////////////////");
-                System.out.println("///////////////////////");
-                System.out.println("na het vinden van de kaartjes");*/
-            }
-
-            /*System.out.println("//////////////////////////////////////////////");
-            for (int i = 1; i < spelers.size(); i++) {
-                System.out.println("spelerid" + i);
-                spelers.get(i).printLijsten();
-                System.out.println();
-                System.out.println();
-            }*/
             
+            //verdere verwerking van de hashSets
+            
+            //voor elke speler
+            for (int i = 1; i < spelers.size(); i++) {
+            	
+        		//als de speler kaartje 'a' zeker niet heeft, maar het zit nog steeds in 1 van de combinaties
+        		//dan mag de character 'a' uit deze combinatie gehaald worden
+                spelers.get(i).filter();
+                //opgelet: enkel voor de lijsten van de speler zelf
 
+                //als er combinaties zijn die maar uit 1 char bestaan, dan is dit een kaartje die de speler heeft
+                //toevoegen van deze kaartjes aan de set met gevondenkaarten
+                spelers.get(i).vindKaartjes();
 
+            }
+            
+            //booleans : als alle kaartjes van de speler gevonden zijn dan zetten we deze op true
             boolean [] spKlaar = new boolean[5];
+            
+            //deze booleans allemaal op false zetten
             for(int i =0 ; i< 5 ; i++){spKlaar[i]=false;}
+            
+            //een variabele die we zullen gebruiken
             boolean spelerklaar = false;
 
+            //zolang niet alle kaartjes van alle spelers gevonden zijn
             while (!spKlaar[1] || !spKlaar[2] || !spKlaar[3] || !spKlaar[4]) {
+            	
+            	//overloop alle spelers
                 for(int j=1 ; j<5 ; j++){
+                	
                     spelerklaar = spKlaar[j];
+        
+                	//als de speler nog niet klaar is
                     if(!spelerklaar){
+                    	
+                    	//kijk naar de 3 andere spelers
                         String andereSpelers = genereerTOVSpelers(j);
 
+                        //deze 3 andere spelers overlopen
                         for(int i=0; i<andereSpelers.length(); i++) {
                             int spelersId = andereSpelers.charAt(i) - 48;
 
+                            //als speler 1 een kaartje a heeft gevonden, mag het uit de combinaties van de andere spelers gehaald worden
                             spelers.get(j).voegAndermansKaartjesAanEigenZekerNiet(spelers.get(spelersId).getGevondenKaartjes());
                         }
+                        
+                        //opnieuw de combinaties checken, als ze maar uit 1 karakter bestaan vinden we het kaartje
                         spelers.get(j).filter();
-
-
                         spelers.get(j).vindKaartjes();
 
+                        //als de speler nu wel klaar is, zet zijn overeenkomstige boolean klaar op true
                         if(spelers.get(j).getAantalGevondenKaartjes()==aantalKaartjesPerPersoon){
                             spKlaar[j]=true;
                         }
+                        
                     }
+                    
                 }
 
             //eind van de while lus
             }
 
-            //nu zouden alle kaartjes moeten gevonden zijn
-            /*for (int i = 1; i < spelers.size(); i++) {
-                System.out.println("spelerid" + i);
-                spelers.get(i).printLijsten();
-                System.out.println();
-                System.out.println();
-            }*/
-
-
-            //genereren van de output
+            //nu zijn alle kaartjes gevonden
+            
+            
+        //genereren van de output
+            
             antwoord.append(spelId+1);
             antwoord.append(" ");
 
@@ -215,6 +208,7 @@ public class Main {
                 antwoord.append(kaartjesLijst);
                 if(i!=4){antwoord.append(" ");}
             }
+            
             if(spelId != aantalSpelletjes-1) {
                 antwoord.append("\n");
             }
@@ -222,6 +216,8 @@ public class Main {
 
             //einde van 1 spelletje
         }
+        
+        //printen van de output
         System.out.println(antwoord.toString());
 
 
@@ -267,21 +263,31 @@ public class Main {
 
 class Speler {
 
-
+	//attributen
     private int aantalGevondenKaartjes;
-
     private HashSet<Character> zekereKaartjes;
     private HashSet<Character> zekerNietKaartjes;
     private HashSet<String> combinatiesMinstensEen;
 
+    //constructoren
     public Speler(){
-
         aantalGevondenKaartjes=0;
         zekereKaartjes = new HashSet<Character>();
         zekerNietKaartjes = new HashSet<Character>();
         combinatiesMinstensEen = new HashSet<String>();
     }
 
+    //getters
+    public int getAantalGevondenKaartjes(){return aantalGevondenKaartjes;}
+    
+    public HashSet<Character> getGevondenKaartjes(){
+        return zekereKaartjes;
+    }
+    
+    /**
+     * bij een nieuw spelletje maken we geen nieuwe variabelen aan
+     * we wissen de inhoud van het oude spelletje
+     */
     public void reset(){
         zekereKaartjes.clear();
         zekerNietKaartjes.clear();
@@ -291,7 +297,6 @@ class Speler {
 
     /**
      * bij een X als antwoord, zijn de 3 kaartjes zeker niet in het bezit van deze speler
-     *
      * @param k1 kaartje1
      * @param k2 kaartje2
      * @param k3 kaartje3
@@ -370,17 +375,14 @@ class Speler {
                 zekereKaartjes.add(s.charAt(0));
                 aantalGevondenKaartjes = zekereKaartjes.size();
             }
-
         }
-
     }
-
-    public int getAantalGevondenKaartjes(){return aantalGevondenKaartjes;}
 
     /**
      * printmethode om te checken wat in elke speler zijn lijsten zit
+     * wordt niet gebruikt in de main, wel om te debuggen
      */
-    public void printLijsten() {
+    /*public void printLijsten() {
         System.out.println("lijst met zekerNietKaartjes");
         for(Character c : zekerNietKaartjes){
             System.out.println(c);
@@ -395,23 +397,20 @@ class Speler {
         /*System.out.println("lijst met gevonden kaartjes");
         for(Character c : getGevondenKaartjes()){
             System.out.println(c);
-        }*/
-    }
+        }
+    }*/
 
-    public HashSet<Character> getGevondenKaartjes(){
-        return zekereKaartjes;
-    }
-
+    //spreekt voor zich
     public void voegAndermansKaartjesAanEigenZekerNiet(HashSet<Character> andermansGevondenKaartjes) {
         for (Character c : andermansGevondenKaartjes){zekerNietKaartjes.add(c);}
     }
 
-    /**
-     * //voert de methode filtercombinaties gewoon 3x uit
-     */
     public void filter() {
         for(int i =0; i<3 ; i++){
+        	//deze methode kan maar 1 aanpassing per keer doen voor elke 3 char tellende string
+        	//daarom voeren we ze 3 keer uit
             filterCombinaties();
+            
         }
     }
 
